@@ -103,8 +103,12 @@ export const editarProducto = async (req, res) => {
       stock,
       categoria,
     } = req.body;
-    const img = await cloudinary.uploader.upload(req.file.path);
-    fs.unlinkSync(req.file.path);
+    let imgUrl = publicFind.imagen;
+    if (req.file && req.file.path) {
+      const img = await cloudinary.uploader.upload(req.file.path);
+      fs.unlinkSync(req.file.path);
+      imgUrl = img.secure_url; // Actualiza la URL de la imagen
+    }
 
     //productos editado
     const productoEditado = {
@@ -117,7 +121,7 @@ export const editarProducto = async (req, res) => {
       precio,
       stock,
       categoria,
-      imagen: img.secure_url,
+      imagen: imgUrl,
     };
 
     const { id } = req.params;

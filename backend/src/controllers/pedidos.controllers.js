@@ -8,22 +8,8 @@ import { validarJWT } from "../helpers/validadJWT.js";
 export const addCart = async (req, res) => {
   try {
     const { idProducto, cantidad } = req.body;
-    const token = req.headers.token;
-    console.log(token);
 
-    if (!token) {
-      return res
-        .status(401)
-        .json({ msg: "You must register to be able to perform this task" });
-    }
-
-    const user = await validarJWT(token);
-    if (!user) {
-      console.log("not token in bakcend");
-      return res.status(401).json({ msg: "Invalid Token" });
-    }
-
-    const idUsuario = user._id;
+    const idUsuario = req.user._id;
 
     console.log(idProducto);
     const obtProducto = await producto.findById(idProducto);
@@ -100,20 +86,10 @@ export const uptdaOrder = async (req, res) => {
 //delete items of the cart
 export const deletItem = async (req, res) => {
   try {
-    const token = req.headers.token;
     const { idProducto } = req.body;
-    if (!token) {
-      return res
-        .status(401)
-        .json({ msg: "You must register to be able to perform this task" });
-    }
 
-    const user = await validarJWT(token);
-    if (!user) {
-      return res.status(401).json({ msg: "Invalid Token" });
-    }
+    const idUsuario = req.user._id;
 
-    const idUsuario = user._id;
     const ObjectId = new mongoose.Types.ObjectId();
 
     const result = await pedidos.updateOne(
@@ -142,20 +118,8 @@ export const deletItem = async (req, res) => {
 // delete order
 export const deletOrder = async (req, res) => {
   try {
-    const token = req.headers.token;
+    const idUsuario = req.user._id;
 
-    if (!token) {
-      return res
-        .status(401)
-        .json({ msg: "You must register to be able to perform this task" });
-    }
-
-    const user = await validarJWT(token);
-    if (!user) {
-      return res.status(401).json({ msg: "Invalid Token" });
-    }
-
-    const idUsuario = user._id;
     const ObjectId = new mongoose.Types.ObjectId();
     const result = await pedidos.findOneAndDelete({ usuario: idUsuario });
 
@@ -173,20 +137,8 @@ export const deletOrder = async (req, res) => {
 // get order for user id
 export const getOrder = async (req, res) => {
   try {
-    const token = req.headers.token;
-    console.log(token);
-    if (!token) {
-      return res
-        .status(401)
-        .json({ msg: "You must register to be able to perform this task" });
-    }
+    const idUsuario = req.user._id;
 
-    const user = await validarJWT(token);
-    if (!user) {
-      return res.status(401).json({ msg: "Invalid Token" });
-    }
-
-    const idUsuario = user._id;
     const ObjectId = new mongoose.Types.ObjectId();
     // Buscar el pedido y poblar los productos
     const result = await pedidos
@@ -207,7 +159,8 @@ export const getOrder = async (req, res) => {
 export const updaAmout = async (req, res) => {
   try {
     const { amount, idProduct } = req.body;
-    const idUsuario = "6728bffd7d4911a899f7c2a7";
+    const idUsuario = req.user._id;
+
     const ObjectId = new mongoose.Types.ObjectId();
     const cardFind = await pedidos.findOne({ usuario: idUsuario });
     const prodFind = cardFind.productos.find(
